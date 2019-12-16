@@ -12,62 +12,54 @@ import { Img } from '~/utils/styles'
 
 const ProductGrid = () => {
   const { store: {checkout} } = useContext(StoreContext)
-  const { allShopifyProduct } = useStaticQuery(
+  const { optusCatalog } = useStaticQuery(
     graphql`
       query {
-        allShopifyProduct(
-          sort: {
-            fields: [createdAt]
-            order: DESC
-          }
-        ) {
-          edges {
-            node {
+        optusCatalog {
+          allPhones {
               id
-              title
-              handle
-              createdAt
-              images {
-                id
-                originalSrc
-                localFile {
-                  childImageSharp {
-                    fluid(maxWidth: 910) {
-                      ...GatsbyImageSharpFluid_withWebp_tracedSVG
-                    }
+              name
+              brand
+              features
+              media
+              pricing
+              mediaimage
+              imageFile {
+                childImageSharp {
+                  fluid(maxWidth: 910) {
+                    ...GatsbyImageSharpFluid_withWebp_tracedSVG
                   }
                 }
               }
-              variants {
-                price
-              }
-            }
           }
         }
       }
     `
   )
-
-  const getPrice = price => Intl.NumberFormat(undefined, {
-    currency: checkout.currencyCode ? checkout.currencyCode : 'EUR',
-    minimumFractionDigits: 2,
-    style: 'currency',
-  }).format(parseFloat(price ? price : 0))
+  const getPrice = price => {
+    console.log(price);
+    //const devicePricing =JSON.parse(price);
+    var firstKey = Object.keys(price)[0];
+    return "$" + price[firstKey].plan;
+  //  return "$0";
+  }
+  //console.log(optusCatalog);
 
   return (
     <Grid>
-      {allShopifyProduct.edges
-        ? allShopifyProduct.edges.map(({ node: { id, handle, title, images: [firstImage], variants: [firstVariant] } }) => (
-          <Product key={id} >
-            <Link to={`/product/${handle}/`}>
-              {firstImage && firstImage.localFile &&
+       {optusCatalog.allPhones
+        ? optusCatalog.allPhones.map(data => (
+          <Product key={data.id} >
+            <Link to={`/product/${data.id}/`}>
+              {data.imageFile  && data.imageFile.childImageSharp && data.imageFile.childImageSharp.fluid &&
                 (<Img
-                  fluid={firstImage.localFile.childImageSharp.fluid}
-                  alt={handle}
-                />)}
+                  fluid={data.imageFile.childImageSharp.fluid}
+                  alt={data.name}
+                />)
+              }
             </Link>
-            <Title>{title}</Title>
-            <PriceTag>{getPrice(firstVariant.price)}</PriceTag>
+            <Title>{data.name}</Title>
+            <PriceTag>{getPrice(data.pricing)}</PriceTag>
           </Product>
         ))
         : <p>No Products found!</p>}

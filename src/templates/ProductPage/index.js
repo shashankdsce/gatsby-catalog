@@ -16,27 +16,33 @@ import {
 } from './styles'
 
 const ProductPage = ({ data }) => {
-  const product = data.shopifyProduct
+
+  const product = data.optusCatalog.Phone
+  console.log('Product is',product);
   return (
     <>
-      <SEO title={product.title} description={product.description} />
+      <SEO title={product.name} description={product.description} />
       <Container>
         <TwoColumnGrid>
           <GridLeft>
-            {product.images.map(image => (
-              <Img
-                fluid={image.localFile.childImageSharp.fluid}
-                key={image.id}
-                alt={product.title}
-              />
-            ))}
+          {product.imageFile  && product.imageFile.childImageSharp && product.imageFile.childImageSharp.fluid &&
+            (<Img
+              fluid={product.imageFile.childImageSharp.fluid}
+              alt={product.name}
+            />)
+          }
+
           </GridLeft>
           <GridRight>
-            <ProductTitle>{product.title}</ProductTitle>
-            <ProductDescription
-              dangerouslySetInnerHTML={{ __html: product.descriptionHtml }}
-            />
-            <ProductForm product={product} />
+            {product &&
+            <>
+              <ProductTitle>{product.title}</ProductTitle>
+              <ProductDescription
+                dangerouslySetInnerHTML={{ __html: product.features }}
+                />
+                <ProductForm product={product} />
+            </>
+            }
           </GridRight>
         </TwoColumnGrid>
       </Container>
@@ -45,45 +51,16 @@ const ProductPage = ({ data }) => {
 }
 
 export const query = graphql`
-  query($handle: String!) {
-    shopifyProduct(handle: { eq: $handle }) {
-      id
-      title
-      handle
-      productType
-      description
-      descriptionHtml
-      shopifyId
-      options {
+  query($handle: ID!) {
+    optusCatalog {
+      Phone( id : $handle ) {
         id
         name
-        values
-      }
-      variants {
-        id
-        title
-        price
-        availableForSale
-        shopifyId
-        selectedOptions {
-          name
-          value
-        }
-      }
-      priceRange {
-        minVariantPrice {
-          amount
-          currencyCode
-        }
-        maxVariantPrice {
-          amount
-          currencyCode
-        }
-      }
-      images {
-        originalSrc
-        id
-        localFile {
+        brand
+        features
+        pricing
+        media
+        imageFile {
           childImageSharp {
             fluid(maxWidth: 910) {
               ...GatsbyImageSharpFluid_withWebp_tracedSVG
@@ -91,6 +68,7 @@ export const query = graphql`
           }
         }
       }
+
     }
   }
 `

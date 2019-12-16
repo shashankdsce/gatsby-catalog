@@ -4,7 +4,7 @@ import { Link } from 'gatsby'
 import { breakpoints } from '../../utils/styles'
 
 export const Wrapper = styled.div`
-  background: rebeccapurple;
+  background: black;
   margin-bottom: 1.45rem;
 `
 
@@ -38,10 +38,3 @@ export const CartCounter = styled.span`
   margin: -10px;
   z-index: 20;
 `
-
-    
-     
-        
-          
-            
-              
