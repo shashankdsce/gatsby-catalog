@@ -25,7 +25,7 @@ const ProductPage = ({ data }) => {
       <Container>
         <TwoColumnGrid>
           <GridLeft>
-          {product.fields.images.localFile  && product.fields.images.localFile.childImageSharp && product.fields.images.localFile.fluid &&
+          {product.fields && product.fields.images && product.fields.images.localFile  && product.fields.images.localFile.childImageSharp && product.fields.images.localFile.fluid &&
             (<Img
               fluid={product.fields.images.localFile.fluid}
               alt={product.name}
