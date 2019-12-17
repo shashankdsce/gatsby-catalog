@@ -15,55 +15,63 @@ exports.createPages = async ({
   const { createPage, createNode, createNodeField } = actions
   return graphql(`
     {
-    optusCatalog {
-      allPhones {
-        id
-        media
+      allPhonesJson {
+        edges {
+          node {
+            id
+          }
+        }
       }
     }
-  }
   `).then(result => {
+    result.data.allPhonesJson.edges.forEach( edge => {
 
-    result.data.optusCatalog.allPhones.forEach( node => {
       createPage({
-        path: `/product/${node.id}/`,
+        path: `/product/${edge.node.id}/`,
         component: path.resolve(`./src/templates/ProductPage/index.js`),
         context: {
           // Data passed to context is available
           // in page queries as GraphQL variables.
-          handle: node.id,
+          handle: edge.node.id,
         },
       })
     })
   })
 }
 
-exports.createResolvers = ({
+exports.onCreateNode = async ({
+  node,
   actions,
+  store,
   cache,
   createNodeId,
-  createResolvers,
-  store,
-  reporter,
 }) => {
-  const { createNode } = actions
-  console.log("Creating nodes");
-  createResolvers({
-    OPTUSCATALOG_Phone: {
-      imageFile: {
-        type: `File`,
-        // projection: { url: true },
-        resolve(source, args, context, info) {
-          return createRemoteFileNode({
-            url:  encodeURI(`https:${source.mediaimage}`),
+  const { createNodeField, createNode } = actions
+  if (node.internal.type === "PhonesJson") {
+    if (node.media) {
+      const images = await Promise.all(
+        node.media.map(url =>
+          createRemoteFileNode({
+            url: encodeURI((url.largeImg.startsWith('//') ? `https:${url.largeImg}` : url.largeImg)),
+            parentNodeId: node.id,
             store,
             cache,
             createNode,
-            createNodeId,
-            reporter,
+            createNodeId: id => `product-images-${node.id}`,
           })
-        },
-      },
-    },
-  })
+        )
+      )
+      await createNodeField({
+        node,
+        name: "images",
+        value: images,
+      })
+
+      node.fields.images.forEach((image, i) => {
+        console.log('Node is',node);
+        console.log('Node fields is',node.fields);
+        image.localFile___NODE = images[i].id
+      })
+    }
+  }
 }

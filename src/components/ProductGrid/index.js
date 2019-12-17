@@ -12,24 +12,52 @@ import { Img } from '~/utils/styles'
 
 const ProductGrid = () => {
   const { store: {checkout} } = useContext(StoreContext)
-  const { optusCatalog } = useStaticQuery(
+  const { allPhonesJson } = useStaticQuery(
     graphql`
       query {
-        optusCatalog {
-          allPhones {
-              id
-              name
-              brand
-              features
-              media
-              pricing
-              mediaimage
-              imageFile {
-                childImageSharp {
-                  fluid(maxWidth: 910) {
-                    ...GatsbyImageSharpFluid_withWebp_tracedSVG
+          allPhonesJson {
+            edges{
+              node {
+                  id
+                  name
+                  brand
+                  features
+                  fields {
+                    images {
+
+                      localFile {
+                        childImageSharp {
+                        fluid(maxWidth: 910) {
+                          ...GatsbyImageSharpFluid_withWebp_tracedSVG
+                        }
+                      }
+                      }
+                    }
                   }
-                }
+                  pricing {
+                    in_stock
+                    _128GB {
+                      default
+                      plan
+                    }
+                    _256GB {
+                      plan
+                      device_outright
+                    }
+                    _32GB {
+                      plan
+                      in_stock
+                    }
+                    _512GB {
+                      plan
+                      in_stock
+                    }
+                    _64GB {
+                      plan
+                      in_stock
+                    }
+                  }
+
               }
           }
         }
@@ -39,27 +67,28 @@ const ProductGrid = () => {
   const getPrice = price => {
     console.log(price);
     //const devicePricing =JSON.parse(price);
-    var firstKey = Object.keys(price)[0];
-    return "$" + price[firstKey].plan;
+    //var firstKey = Object.keys(price)[0];
+    return "$50" ;
   //  return "$0";
   }
-  //console.log(optusCatalog);
+
 
   return (
     <Grid>
-       {optusCatalog.allPhones
-        ? optusCatalog.allPhones.map(data => (
-          <Product key={data.id} >
-            <Link to={`/product/${data.id}/`}>
-              {data.imageFile  && data.imageFile.childImageSharp && data.imageFile.childImageSharp.fluid &&
+       {allPhonesJson.edges
+        ? allPhonesJson.edges.map(data => (
+          <Product key={data.node.id} >
+            <Link to={`/product/${data.node.id}/`}>
+
+              {data.node.fields && data.node.fields.images &&
                 (<Img
-                  fluid={data.imageFile.childImageSharp.fluid}
-                  alt={data.name}
+                  fluid={data.node.fields.images[0].localFile.childImageSharp.fluid}
+                  alt={data.node.name}
                 />)
               }
             </Link>
-            <Title>{data.name}</Title>
-            <PriceTag>{getPrice(data.pricing)}</PriceTag>
+            <Title>{data.node.name}</Title>
+            <PriceTag>{data.node.id} {getPrice(data.node.pricing)}</PriceTag>
           </Product>
         ))
         : <p>No Products found!</p>}

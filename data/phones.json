@@ -1,5 +1,4 @@
-{
-  "phones": [
+[
     {
       "visible": true,
       "wifi_calling": true,
@@ -1724,5 +1723,5 @@
       },
       "id": 31
     }
-  ]
-}
+
+]

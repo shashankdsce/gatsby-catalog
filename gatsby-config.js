@@ -23,12 +23,13 @@ module.exports = {
       resolve: `gatsby-source-filesystem`,
       options: {
         name: `data`,
-        path: `${__dirname}/src/data`,
+        path: path.join(__dirname, `data`),
       },
     },
     `gatsby-transformer-sharp`,
     `gatsby-plugin-sharp`,
     `gatsby-plugin-layout`,
+    `gatsby-transformer-json`,
     {
       resolve: `gatsby-plugin-manifest`,
       options: {
@@ -39,6 +40,26 @@ module.exports = {
         theme_color: `#663399`,
         display: `standalone`,
         icon: `src/images/gatsby-icon.png`, // This path is relative to the root of the site.
+      },
+    },
+    {
+      resolve: `gatsby-plugin-remote-images`,
+      options: {
+        // The node type that has the images you want to grab.
+        // This is generally the camelcased version of the word
+        // after the 'all' in GraphQL ie. allMyImages type is myImages
+        nodeType: 'phonesJson',
+        // For simple object traversal, this is the string path to the image you
+        // want to use, relative to the node.
+        // This uses lodash .get, see [docs for accepted formats here](https://lodash.com/docs/4.17.11#get).
+        // For traversing objects with arrays at given depths, see [how to handle arrays below](#traversing-objects-with-arrays)
+        imagePath: 'media.largeImg',
+        // ** ALL OPTIONAL BELOW HERE: **
+        // Name you want to give new image field on the node.
+        // Defaults to 'localImage'.        
+        // Allows modification of the URL per image if needed. Expects a function
+        // taking the original URL as a parameter and returning the desired URL.
+        prepareUrl: url => (url.startsWith('//') ? `https:${url}` : url),
       },
     },
     {
