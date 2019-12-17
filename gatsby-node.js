@@ -48,33 +48,32 @@ exports.onCreateNode = async ({
   const { createNodeField, createNode } = actions
   if (node.internal.type === "PhonesJson") {
     if (node.media) {
-      const images = await Promise.all(
-        node.media.map(url =>
-          try {
-            createRemoteFileNode({
-              url: encodeURI((url.largeImg.startsWith('//') ? `https:${url.largeImg}` : url.largeImg)),
-              parentNodeId: node.id,
-              store,
-              cache,
-              createNode,
-              createNodeId: id => `product-images-${node.id}`,
-            })  
-          } catch (err) {
-            console.log(err)
+       try {
+         const images = await Promise.all(
+           node.media.map(url =>
+               createRemoteFileNode({
+                 url: encodeURI((url.largeImg.startsWith('//') ? `https:${url.largeImg}` : url.largeImg)),
+                 parentNodeId: node.id,
+                 store,
+                 cache,
+                 createNode,
+                 createNodeId: id => `product-images-${node.id}`,
+               })
+           )
+         )
+         await createNodeField({
+           node,
+           name: "images",
+           value: images,
+         })
 
-          }
+         node.fields.images.forEach((image, i) => {
+           image.localFile___NODE = images[i].id
+         })
+       } catch (err) {
+         console.log(err);
+       }
 
-        )
-      )
-      await createNodeField({
-        node,
-        name: "images",
-        value: images,
-      })
-
-      node.fields.images.forEach((image, i) => {
-        image.localFile___NODE = images[i].id
-      })
     }
   }
 }
