@@ -25,7 +25,6 @@ exports.createPages = async ({
     }
   `).then(result => {
     result.data.allPhonesJson.edges.forEach( edge => {
-
       createPage({
         path: `/product/${edge.node.id}/`,
         component: path.resolve(`./src/templates/ProductPage/index.js`),
@@ -68,8 +67,6 @@ exports.onCreateNode = async ({
       })
 
       node.fields.images.forEach((image, i) => {
-        console.log('Node is',node);
-        console.log('Node fields is',node.fields);
         image.localFile___NODE = images[i].id
       })
     }

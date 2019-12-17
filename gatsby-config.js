@@ -56,23 +56,12 @@ module.exports = {
         imagePath: 'media.largeImg',
         // ** ALL OPTIONAL BELOW HERE: **
         // Name you want to give new image field on the node.
-        // Defaults to 'localImage'.        
+        // Defaults to 'localImage'.
         // Allows modification of the URL per image if needed. Expects a function
         // taking the original URL as a parameter and returning the desired URL.
         prepareUrl: url => (url.startsWith('//') ? `https:${url}` : url),
       },
-    },
-    {
-      resolve: "gatsby-source-graphql",
-      options: {
-        // This type will contain remote schema Query type
-        typeName: "OPTUSCATALOG",
-        // This is the field under which it's accessible
-        fieldName: "optusCatalog",
-        // URL to query from
-        url: "http://localhost:3002",
-      },
-    },
+    },    
     {
       resolve: 'gatsby-plugin-root-import',
       options: {
