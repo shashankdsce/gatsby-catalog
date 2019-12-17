@@ -50,14 +50,20 @@ exports.onCreateNode = async ({
     if (node.media) {
       const images = await Promise.all(
         node.media.map(url =>
-          createRemoteFileNode({
-            url: encodeURI((url.largeImg.startsWith('//') ? `https:${url.largeImg}` : url.largeImg)),
-            parentNodeId: node.id,
-            store,
-            cache,
-            createNode,
-            createNodeId: id => `product-images-${node.id}`,
-          })
+          try {
+            createRemoteFileNode({
+              url: encodeURI((url.largeImg.startsWith('//') ? `https:${url.largeImg}` : url.largeImg)),
+              parentNodeId: node.id,
+              store,
+              cache,
+              createNode,
+              createNodeId: id => `product-images-${node.id}`,
+            })  
+          } catch (err) {
+            console.log(err)
+
+          }
+
         )
       )
       await createNodeField({
